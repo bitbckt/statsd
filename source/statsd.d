@@ -386,8 +386,15 @@ private:
     void send(scope immutable string key, long value, Types type, float frequency) nothrow {
         import std.algorithm.comparison : clamp;
         import std.exception : assumeWontThrow; // Pinky promise.
-        import std.math : isClose;
-        import std.math.traits : isNaN;
+
+        version (DigitalMars) {
+            import std.math : isClose;
+            import std.math.traits : isNaN;
+        } else version (LDC) {
+            import std.math : approxEqual, isNaN;
+            alias approxEqual isClose;
+        }
+
         import std.outbuffer;
 
         const float freq = clamp(frequency, 0.0, 1.0);
