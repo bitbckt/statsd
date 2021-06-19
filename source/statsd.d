@@ -392,7 +392,7 @@ private:
             import std.math.traits : isNaN;
         } else version (LDC) {
             import std.math : approxEqual, isNaN;
-            alias approxEqual isClose;
+            alias isClose = approxEqual;
         }
 
         import std.outbuffer;
