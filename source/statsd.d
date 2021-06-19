@@ -47,6 +47,8 @@ struct StatsD {
         auto pair = socketPair();
         scope(exit) foreach (s; pair) s.close();
 
+        pair[1].blocking(false);
+
         auto stats = new StatsD(pair[0].handle, "myPrefix");
 
         auto buf = new ubyte[256];
@@ -71,7 +73,6 @@ struct StatsD {
         stats.incr("incr", 0.5);
 
         buf[] = 0;
-        pair[1].blocking(false);
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
 
@@ -110,6 +111,8 @@ struct StatsD {
         auto pair = socketPair();
         scope(exit) foreach (s; pair) s.close();
 
+        pair[1].blocking(false);
+
         auto stats = new StatsD(pair[0].handle, "myPrefix");
 
         auto buf = new ubyte[256];
@@ -129,12 +132,11 @@ struct StatsD {
         stats.decr("decr", 0.5);
 
         buf[] = 0;
-        pair[1].blocking(false);
+
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
 
         stats.incr("decr", 0.0);
-
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
 
@@ -170,6 +172,8 @@ struct StatsD {
         auto pair = socketPair();
         scope(exit) foreach (s; pair) s.close();
 
+        pair[1].blocking(false);
+
         auto stats = new StatsD(pair[0].handle, "myPrefix");
 
         auto buf = new ubyte[256];
@@ -189,7 +193,6 @@ struct StatsD {
         stats.count("count", 42, 0.5);
 
         buf[] = 0;
-        pair[1].blocking(false);
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
 
@@ -231,6 +234,8 @@ struct StatsD {
         auto pair = socketPair();
         scope(exit) foreach (s; pair) s.close();
 
+        pair[1].blocking(false);
+
         auto stats = new StatsD(pair[0].handle, "myPrefix");
 
         auto buf = new ubyte[256];
@@ -250,7 +255,6 @@ struct StatsD {
         stats.gauge("gauge", 128, 0.5);
 
         buf[] = 0;
-        pair[1].blocking(false);
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
 
@@ -294,6 +298,8 @@ struct StatsD {
         auto pair = socketPair();
         scope(exit) foreach (s; pair) s.close();
 
+        pair[1].blocking(false);
+
         auto stats = new StatsD(pair[0].handle, "myPrefix");
 
         auto buf = new ubyte[256];
@@ -313,7 +319,6 @@ struct StatsD {
         stats.timing("timing", 2, 0.5);
 
         buf[] = 0;
-        pair[1].blocking(false);
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
 
@@ -352,6 +357,8 @@ struct StatsD {
 
         auto pair = socketPair();
         scope(exit) foreach (s; pair) s.close();
+
+        pair[1].blocking(false);
 
         auto stats = new StatsD(pair[0].handle, "myPrefix");
 
