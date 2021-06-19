@@ -14,3 +14,4 @@ matrix:
 
 script:
   - dub test --build=unittest --compiler=${DC}
+  - dub lint
