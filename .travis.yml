@@ -1,0 +1,17 @@
+language: d
+sudo: false
+
+install:
+  - ./travis_install.sh
+
+packages:
+  - gcc-multilib
+
+matrix:
+  include:
+    - d: dmd
+    - d: ldc
+    - d: gdc
+
+script:
+  - dub test --build=unittest --compiler=${DC}
