@@ -14,7 +14,7 @@ matrix:
 
 script:
   - dub test --build=unittest-cov --compiler=${DC}
-  - dub lint
+  - dub lint -- --styleCheck --skipTests
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
