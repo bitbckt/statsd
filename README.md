@@ -1,6 +1,7 @@
 # statsd
 
 [![Build Status](https://travis-ci.com/bitbckt/statsd.svg?branch=master)](https://travis-ci.com/bitbckt/statsd)
+[![codecov](https://codecov.io/gh/bitbckt/statsd/branch/master/graph/badge.svg?token=W1CUSL1E3N)](https://codecov.io/gh/bitbckt/statsd)
 
 statsd is a D library for sending metrics to a StatsD daemon.
 
