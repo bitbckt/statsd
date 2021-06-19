@@ -125,7 +125,7 @@ private:
         if (closeToOne) {
             assumeWontThrow(buf.writef("%s%s:%d|%r", prefix, key, value, type));
         } else {
-            assumeWontThrow(buf.writef("%s%s:%d|%s|@%.2f", prefix, key, value, type, frequency));
+            assumeWontThrow(buf.writef("%s%s:%d|%r|@%.2f", prefix, key, value, type, frequency));
         }
 
         scope ubyte[] bytes = buf.toBytes();
@@ -184,4 +184,18 @@ unittest {
     buf[] = 0;
     pair[1].receive(buf);
     assert(fromStringz(cast(char*)buf.ptr) == "myPrefixset:4294967295|s");
+
+    stats.seed(42);
+    stats.incr("incr", 0.5);
+
+    buf[] = 0;
+    pair[1].receive(buf);
+    assert(fromStringz(cast(char*)buf.ptr) == "myPrefixincr:1|c|@0.50");
+
+    stats.incr("incr", 0.5);
+
+    buf[] = 0;
+    pair[1].blocking(false);
+    pair[1].receive(buf);
+    assert(fromStringz(cast(char*)buf.ptr) == "");
 }
