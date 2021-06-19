@@ -56,6 +56,11 @@ struct StatsD {
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "myPrefixincr:1|c");
 
+        stats.incr("incr", float.max);
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixincr:1|c");
+
         stats.seed(42);
         stats.incr("incr", 0.5);
 
@@ -71,6 +76,11 @@ struct StatsD {
         assert(fromStringz(cast(char*)buf.ptr) == "");
 
         stats.incr("incr", 0.0);
+
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.incr("incr", float.nan);
 
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
@@ -113,6 +123,11 @@ struct StatsD {
         assert(fromStringz(cast(char*)buf.ptr) == "");
 
         stats.incr("decr", 0.0);
+
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.decr("decr", float.nan);
 
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
@@ -160,6 +175,11 @@ struct StatsD {
 
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.count("count", 42, float.nan);
+
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
     }
 
     /**
@@ -202,6 +222,11 @@ struct StatsD {
         assert(fromStringz(cast(char*)buf.ptr) == "");
 
         stats.gauge("gauge", 128, 0.0);
+
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.gauge("gauge", 42, float.nan);
 
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
@@ -252,6 +277,11 @@ struct StatsD {
 
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.gauge("timing", 2, float.nan);
+
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
     }
 
     /**
@@ -295,12 +325,13 @@ private:
         import std.algorithm.comparison : clamp;
         import std.exception : assumeWontThrow; // Pinky promise.
         import std.math : isClose;
+        import std.math.traits : isNaN;
         import std.outbuffer;
 
         const float freq = clamp(frequency, 0.0, 1.0);
 
         // Drop everything.
-        if (isClose(0.0, freq)) {
+        if (isClose(0.0, freq) || isNaN(freq)) {
             return;
         }
 
