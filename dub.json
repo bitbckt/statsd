@@ -1,0 +1,10 @@
+{
+  "authors": [
+    "Brandon Mitchell"
+  ],
+  "copyright": "Copyright © 2021, Brandon Mitchell",
+  "description": "A StatsD client.",
+  "license": "MIT",
+  "name": "statsd",
+  "targetType": "library",
+}
