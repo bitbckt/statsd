@@ -53,7 +53,6 @@ struct StatsD {
 
         stats.incr("incr");
 
-        buf[] = 0;
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "myPrefixincr:1|c");
 
@@ -91,7 +90,6 @@ struct StatsD {
 
         stats.decr("decr");
 
-        buf[] = 0;
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "myPrefixdecr:-1|c");
 
@@ -131,7 +129,6 @@ struct StatsD {
 
         stats.count("count", 42);
 
-        buf[] = 0;
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "myPrefixcount:42|c");
 
@@ -172,7 +169,6 @@ struct StatsD {
 
         stats.gauge("gauge", 128);
 
-        buf[] = 0;
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "myPrefixgauge:128|g");
 
@@ -215,7 +211,6 @@ struct StatsD {
 
         stats.timing("timing", 2);
 
-        buf[] = 0;
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "myPrefixtiming:2|ms");
 
@@ -254,7 +249,6 @@ struct StatsD {
 
         stats.set("set", uint.max);
 
-        buf[] = 0;
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "myPrefixset:4294967295|s");
     }
