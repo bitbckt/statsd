@@ -41,11 +41,73 @@ struct StatsD {
         count(key, 1, frequency);
     }
 
+    unittest {
+        import std.string;
+
+        auto pair = socketPair();
+        scope(exit) foreach (s; pair) s.close();
+
+        auto stats = new StatsD(pair[0].handle, "myPrefix");
+
+        auto buf = new ubyte[256];
+
+        stats.incr("incr");
+
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixincr:1|c");
+
+        stats.seed(42);
+        stats.incr("incr", 0.5);
+
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixincr:1|c|@0.50");
+
+        stats.incr("incr", 0.5);
+
+        buf[] = 0;
+        pair[1].blocking(false);
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
+    }
+
     /**
      * Equivalent to `count(key, -1, frequency)`.
      */
     void decr(scope immutable string key, float frequency = 1.0) nothrow {
         count(key, -1, frequency);
+    }
+
+    unittest {
+        import std.string;
+
+        auto pair = socketPair();
+        scope(exit) foreach (s; pair) s.close();
+
+        auto stats = new StatsD(pair[0].handle, "myPrefix");
+
+        auto buf = new ubyte[256];
+
+        stats.decr("decr");
+
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixdecr:-1|c");
+
+        stats.seed(42);
+        stats.decr("decr", 0.5);
+
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixdecr:-1|c|@0.50");
+
+        stats.decr("decr", 0.5);
+
+        buf[] = 0;
+        pair[1].blocking(false);
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
     }
 
     /**
@@ -57,6 +119,37 @@ struct StatsD {
         send(key, delta, Types.Counter, frequency);
     }
 
+    unittest {
+        import std.string;
+
+        auto pair = socketPair();
+        scope(exit) foreach (s; pair) s.close();
+
+        auto stats = new StatsD(pair[0].handle, "myPrefix");
+
+        auto buf = new ubyte[256];
+
+        stats.count("count", 42);
+
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixcount:42|c");
+
+        stats.seed(42);
+        stats.count("count", 42, 0.5);
+
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixcount:42|c|@0.50");
+
+        stats.count("count", 42, 0.5);
+
+        buf[] = 0;
+        pair[1].blocking(false);
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
+    }
+
     /**
      * Emits a gauge which maintains its value until it is next set.
      *
@@ -65,6 +158,37 @@ struct StatsD {
      */
     void gauge(scope immutable string key, uint value, float frequency = 1.0) nothrow {
         send(key, value, Types.Gauge, frequency);
+    }
+
+    unittest {
+        import std.string;
+
+        auto pair = socketPair();
+        scope(exit) foreach (s; pair) s.close();
+
+        auto stats = new StatsD(pair[0].handle, "myPrefix");
+
+        auto buf = new ubyte[256];
+
+        stats.gauge("gauge", 128);
+
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixgauge:128|g");
+
+        stats.seed(42);
+        stats.gauge("gauge", 128, 0.5);
+
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixgauge:128|g|@0.50");
+
+        stats.gauge("gauge", 128, 0.5);
+
+        buf[] = 0;
+        pair[1].blocking(false);
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
     }
 
     /**
@@ -79,12 +203,60 @@ struct StatsD {
         send(key, ms, Types.Timing, frequency);
     }
 
+    unittest {
+        import std.string;
+
+        auto pair = socketPair();
+        scope(exit) foreach (s; pair) s.close();
+
+        auto stats = new StatsD(pair[0].handle, "myPrefix");
+
+        auto buf = new ubyte[256];
+
+        stats.timing("timing", 2);
+
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixtiming:2|ms");
+
+        stats.seed(42);
+        stats.timing("timing", 2, 0.5);
+
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixtiming:2|ms|@0.50");
+
+        stats.timing("timing", 2, 0.5);
+
+        buf[] = 0;
+        pair[1].blocking(false);
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
+    }
+
     /**
      * Emits a set metric. A StatsD daemon will count unique
      * occurrences of each value between flushes.
      */
     void set(scope immutable string key, uint value) nothrow {
         send(key, value, Types.Set, 1.0);
+    }
+
+    unittest {
+        import std.string;
+
+        auto pair = socketPair();
+        scope(exit) foreach (s; pair) s.close();
+
+        auto stats = new StatsD(pair[0].handle, "myPrefix");
+
+        auto buf = new ubyte[256];
+
+        stats.set("set", uint.max);
+
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixset:4294967295|s");
     }
 
     /**
@@ -136,66 +308,4 @@ private:
             write(socket, bytes.ptr, bytes.length);
         }
     }
-}
-
-unittest {
-    import std.stdio;
-    import std.string;
-
-    auto pair = socketPair();
-    scope(exit) foreach (s; pair) s.close();
-
-    auto stats = new StatsD(pair[0].handle, "myPrefix");
-
-    auto buf = new ubyte[256];
-
-    stats.incr("incr");
-
-    buf[] = 0;
-    pair[1].receive(buf);
-    assert(fromStringz(cast(char*)buf.ptr) == "myPrefixincr:1|c");
-
-    stats.decr("decr");
-
-    buf[] = 0;
-    pair[1].receive(buf);
-    assert(fromStringz(cast(char*)buf.ptr) == "myPrefixdecr:-1|c");
-
-    stats.count("count", 42);
-
-    buf[] = 0;
-    pair[1].receive(buf);
-    assert(fromStringz(cast(char*)buf.ptr) == "myPrefixcount:42|c");
-
-    stats.gauge("gauge", 128);
-
-    buf[] = 0;
-    pair[1].receive(buf);
-    assert(fromStringz(cast(char*)buf.ptr) == "myPrefixgauge:128|g");
-
-    stats.timing("timing", 2);
-
-    buf[] = 0;
-    pair[1].receive(buf);
-    assert(fromStringz(cast(char*)buf.ptr) == "myPrefixtiming:2|ms");
-
-    stats.set("set", uint.max);
-
-    buf[] = 0;
-    pair[1].receive(buf);
-    assert(fromStringz(cast(char*)buf.ptr) == "myPrefixset:4294967295|s");
-
-    stats.seed(42);
-    stats.incr("incr", 0.5);
-
-    buf[] = 0;
-    pair[1].receive(buf);
-    assert(fromStringz(cast(char*)buf.ptr) == "myPrefixincr:1|c|@0.50");
-
-    stats.incr("incr", 0.5);
-
-    buf[] = 0;
-    pair[1].blocking(false);
-    pair[1].receive(buf);
-    assert(fromStringz(cast(char*)buf.ptr) == "");
 }
