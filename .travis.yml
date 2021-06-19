@@ -13,5 +13,8 @@ matrix:
     - d: ldc
 
 script:
-  - dub test --build=unittest --compiler=${DC}
+  - dub test --build=unittest-cov --compiler=${DC}
   - dub lint
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
