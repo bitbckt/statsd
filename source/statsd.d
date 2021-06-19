@@ -34,6 +34,15 @@ struct StatsD {
         seed();
     }
 
+    @disable this();
+
+    unittest {
+        import std.conv : emplace;
+
+        StatsD stats = void;
+        static assert(!__traits(compiles, emplace(&stats)));
+    }
+
     /**
      * Equivalent to `count(key, 1, frequency)`.
      */
