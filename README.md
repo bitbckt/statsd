@@ -1,5 +1,7 @@
 # statsd
 
+[![Build Status](https://travis-ci.com/bitbckt/statsd.svg?branch=master)](https://travis-ci.com/bitbckt/statsd)
+
 statsd is a D library for sending metrics to a StatsD daemon.
 
 The StatsD protocol is defined by the Etsy StatsD daemon, which may be
