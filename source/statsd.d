@@ -69,6 +69,11 @@ struct StatsD {
         pair[1].blocking(false);
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.incr("incr", 0.0);
+
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
     }
 
     /**
@@ -104,6 +109,11 @@ struct StatsD {
 
         buf[] = 0;
         pair[1].blocking(false);
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.incr("decr", 0.0);
+
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
     }
@@ -143,6 +153,11 @@ struct StatsD {
 
         buf[] = 0;
         pair[1].blocking(false);
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.count("count", 42, 0.0);
+
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
     }
@@ -185,6 +200,11 @@ struct StatsD {
         pair[1].blocking(false);
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.gauge("gauge", 128, 0.0);
+
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
     }
 
     /**
@@ -225,6 +245,11 @@ struct StatsD {
 
         buf[] = 0;
         pair[1].blocking(false);
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.timing("timing", 2, 0.0);
+
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
     }
