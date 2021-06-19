@@ -84,6 +84,17 @@ struct StatsD {
 
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.incr("incr", float.infinity);
+
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixincr:1|c");
+
+        stats.incr("incr", -float.infinity);
+
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
     }
 
     /**
@@ -129,6 +140,17 @@ struct StatsD {
 
         stats.decr("decr", float.nan);
 
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.decr("decr", float.infinity);
+
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixdecr:-1|c");
+
+        stats.decr("decr", -float.infinity);
+
+        buf[] = 0;
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
     }
@@ -180,6 +202,17 @@ struct StatsD {
 
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.count("count", 42, float.infinity);
+
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixcount:42|c");
+
+        stats.count("count", 42, -float.infinity);
+
+        buf[] = 0;
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
     }
 
     /**
@@ -226,8 +259,19 @@ struct StatsD {
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
 
-        stats.gauge("gauge", 42, float.nan);
+        stats.gauge("gauge", 128, float.nan);
 
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.gauge("gauge", 128, float.infinity);
+
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixgauge:128|g");
+
+        stats.gauge("gauge", 128, -float.infinity);
+
+        buf[] = 0;
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
     }
@@ -278,8 +322,19 @@ struct StatsD {
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
 
-        stats.gauge("timing", 2, float.nan);
+        stats.timing("timing", 2, float.nan);
 
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "");
+
+        stats.timing("timing", 2, float.infinity);
+
+        pair[1].receive(buf);
+        assert(fromStringz(cast(char*)buf.ptr) == "myPrefixtiming:2|ms");
+
+        stats.timing("timing", 2, -float.infinity);
+
+        buf[] = 0;
         pair[1].receive(buf);
         assert(fromStringz(cast(char*)buf.ptr) == "");
     }
