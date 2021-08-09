@@ -1,0 +1,49 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+    tags: "*"
+
+jobs:
+  test:
+    name: Tests
+    strategy:
+      fail-fast: false
+      matrix:
+        dc:
+          - dmd-latest
+          - ldc-latest
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install ${{ matrix.dc }}
+        uses: dlang-community/setup-dlang@v1.1.0
+        with:
+          compiler: ${{ matrix.dc }}
+
+      - name: "Run tests"
+        run: $(pwd)/ci.sh
+        env:
+          TERM: xterm
+
+  coverage:
+    name: Code coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install ${{ matrix.dc }}
+        uses: dlang-community/setup-dlang@v1.1.0
+        with:
+            compiler: ${{ matrix.dc }}
+
+      - name: "Run tests"
+        run: $(pwd)/ci.sh
+        env:
+          TERM: xterm
+
+      - uses: codecov/codecov-action@v2
